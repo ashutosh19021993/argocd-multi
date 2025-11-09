@@ -1,0 +1,40 @@
+apiVersion: argoproj.io/v1alpha1
+kind: ApplicationSet
+metadata:
+  name: multi-app-multi-cluster
+  namespace: argocd
+spec:
+  generators:
+    - git:
+        repoURL: https://github.com/YOUR_USER/multi-app-demo.git
+        revision: main
+        directories:
+          - path: apps/*
+  template:
+    metadata:
+      name: '{{path.basename}}'
+    spec:
+      project: default
+      source:
+        repoURL: https://github.com/YOUR_USER/multi-app-demo.git
+        targetRevision: main
+        path: '{{path}}'
+        helm:
+          valueFiles:
+            - values.yaml
+      destination:
+        server: >-
+          {{- if eq .Values.app.cluster "cluster1" -}}
+          https://cluster1-control-plane:6443
+          {{- else if eq .Values.app.cluster "cluster2" -}}
+          https://cluster2-control-plane:6443
+          {{- else -}}
+          https://kubernetes.default.svc
+          {{- end -}}
+        namespace: '{{ .Values.app.namespace }}'
+      syncPolicy:
+        automated:
+          prune: true
+          selfHeal: true
+        syncOptions:
+          - CreateNamespace=true

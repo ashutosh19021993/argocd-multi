@@ -1,0 +1,13 @@
+app:
+  name: booking
+  namespace: booking
+  cluster: cluster2
+
+image:
+  repository: httpd
+  tag: latest
+  pullPolicy: IfNotPresent
+
+service:
+  type: ClusterIP
+  port: 80

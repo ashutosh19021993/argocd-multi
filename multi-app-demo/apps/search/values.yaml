@@ -1,0 +1,13 @@
+app:
+  name: search
+  namespace: search
+  cluster: in-cluster
+
+image:
+  repository: redis
+  tag: latest
+  pullPolicy: IfNotPresent
+
+service:
+  type: ClusterIP
+  port: 6379
