@@ -6,17 +6,17 @@ metadata:
 spec:
   generators:
     - git:
-        repoURL: https://github.com/YOUR_USER/multi-app-demo.git
+        repoURL: https://github.com/ashutosh19021993/argocd-multi.git
         revision: main
         directories:
-          - path: apps/*
+          - path: multi-app-demo/apps/*
   template:
     metadata:
       name: '{{path.basename}}'
     spec:
       project: default
       source:
-        repoURL: https://github.com/YOUR_USER/multi-app-demo.git
+        repoURL: https://github.com/ashutosh19021993/argocd-multi.git
         targetRevision: main
         path: '{{path}}'
         helm:
