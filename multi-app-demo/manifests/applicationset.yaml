@@ -5,14 +5,25 @@ metadata:
   namespace: argocd
 spec:
   generators:
-    - git:
-        repoURL: https://github.com/ashutosh19021993/argocd-multi.git
-        revision: main
-        directories:
-          - path: multi-app-demo/apps/*
+    - list:
+        elements:
+          - appName: payments
+            path: multi-app-demo/apps/payments
+            namespace: payments
+            server: https://cluster1-control-plane:6443
+
+          - appName: booking
+            path: multi-app-demo/apps/booking
+            namespace: booking
+            server: https://cluster2-control-plane:6443
+
+          - appName: search
+            path: multi-app-demo/apps/search
+            namespace: search
+            server: https://kubernetes.default.svc   # Argo's own cluster (in-cluster)
   template:
     metadata:
-      name: '{{path.basename}}'
+      name: '{{appName}}'
     spec:
       project: default
       source:
@@ -23,15 +34,8 @@ spec:
           valueFiles:
             - values.yaml
       destination:
-        server: >-
-          {{- if eq .Values.app.cluster "cluster1" -}}
-          https://cluster1-control-plane:6443
-          {{- else if eq .Values.app.cluster "cluster2" -}}
-          https://cluster2-control-plane:6443
-          {{- else -}}
-          https://kubernetes.default.svc
-          {{- end -}}
-        namespace: '{{ .Values.app.namespace }}'
+        server: '{{server}}'
+        namespace: '{{namespace}}'
       syncPolicy:
         automated:
           prune: true
