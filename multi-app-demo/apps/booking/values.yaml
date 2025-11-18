@@ -1,5 +1,5 @@
 app:
-  name: bookings
+  name: booking
   namespace: booking
   cluster: cluster2
 
