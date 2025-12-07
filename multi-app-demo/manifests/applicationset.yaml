@@ -10,17 +10,17 @@ spec:
           - appName: payments
             path: multi-app-demo/apps/payments
             namespace: payments
-            server: https://cluster1-control-plane:6443
+            server: https://app-cluster-control-plane:6443   # child cluster
 
           - appName: booking
             path: multi-app-demo/apps/booking
             namespace: booking
-            server: https://cluster2-control-plane:6443
+            server: https://kubernetes.default.svc           # argo's own cluster
 
           - appName: search
             path: multi-app-demo/apps/search
             namespace: search
-            server: https://kubernetes.default.svc   # Argo's own cluster (in-cluster)
+            server: https://kubernetes.default.svc           # argo's own cluster
   template:
     metadata:
       name: '{{appName}}'
