@@ -1,6 +1,6 @@
 app:
-  name: bookings
-  namespace: bookings
+  name: booking
+  namespace: booking
   cluster: cluster2
 
 image:
