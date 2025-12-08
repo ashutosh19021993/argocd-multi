@@ -1,5 +1,21 @@
 pipeline {
-    agent any
+    agent {
+    kubernetes {
+      yaml """
+apiVersion: v1
+kind: Pod
+metadata:
+  labels:
+    app: argo-sync-agent
+spec:
+  containers:
+    - name: argocd-cli
+      image: argoproj/argocd:v3.1.9
+      command: ["sh", "-c", "cat"]
+      tty: true
+"""
+    }
+  }
 
     environment {
         ARGOCD_SERVER = 'host.docker.internal:8080'
