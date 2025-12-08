@@ -10,8 +10,8 @@ metadata:
 spec:
   containers:
     - name: argocd-cli
-      image: argoproj/argocd:latest
-      command: ["sh", "-c", "cat"]
+      image: quay.io/argoproj/argocd:v3.1.9
+      command: ["/bin/sh", "-c", "cat"]
       tty: true
 """
     }
