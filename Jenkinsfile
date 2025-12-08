@@ -10,9 +10,16 @@ metadata:
 spec:
   containers:
     - name: argocd-cli
-      image: quay.io/argoproj/argocd:v3.1.9
+      image: alpine:3.20
       command: ["/bin/sh", "-c", "cat"]
       tty: true
+       volumeMounts:
+        - name: workspace-volume
+          mountPath: /home/jenkins/agent
+
+  volumes:
+    - name: workspace-volume
+      emptyDir: {}
 """
     }
   }
