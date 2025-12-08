@@ -18,13 +18,15 @@ spec:
   }
 
   environment {
-    ARGOCD_SERVER = 'host.docker.internal:8080'   // adjust later if needed
+    // Argo CD is running in the same cluster as Jenkins
+    // and exposed by the argocd-server Service in the argocd namespace.
+    ARGOCD_SERVER = 'argocd-server.argocd.svc.cluster.local:443'
     ARGOCD_USER   = 'admin'
     ARGOCD_PASS   = credentials('argocd-admin-password')
   }
 
   triggers {
-    // Poll GitHub every 1 minute for changes
+    // Poll Git repo every minute for changes (optional)
     pollSCM('* * * * *')
   }
 
