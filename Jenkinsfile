@@ -13,7 +13,7 @@ spec:
       image: alpine:3.20
       command: ["/bin/sh", "-c", "cat"]
       tty: true
-       volumeMounts:
+      volumeMounts:
         - name: workspace-volume
           mountPath: /home/jenkins/agent
 
@@ -32,19 +32,27 @@ spec:
     ARGOCD_PASS   = credentials('argocd-admin-password')
   }
 
+  // Optional: this makes Jenkins poll the Git repo every minute
   triggers {
-    // Poll Git repo every minute for changes (optional)
     pollSCM('* * * * *')
   }
 
   stages {
-    stage('Check argocd CLI') {
+    stage('Install & Check argocd CLI') {
       steps {
         container('argocd-cli') {
           sh '''
-            echo "🔎 Checking argocd client..."
-            which argocd || echo "argocd not in PATH"
-            argocd version --client || echo "argocd version failed"
+            echo "🔧 Installing argocd CLI in this agent pod..."
+
+            apk add --no-cache curl
+
+            curl -sSL -o /usr/local/bin/argocd \
+              https://github.com/argoproj/argo-cd/releases/latest/download/argocd-linux-amd64
+
+            chmod +x /usr/local/bin/argocd
+
+            echo "✅ argocd client version:"
+            argocd version --client
           '''
         }
       }
@@ -55,11 +63,14 @@ spec:
         container('argocd-cli') {
           sh '''
             echo "🔐 Logging into ArgoCD at ${ARGOCD_SERVER}..."
+
             argocd login ${ARGOCD_SERVER} \
               --username ${ARGOCD_USER} \
               --password ${ARGOCD_PASS} \
               --insecure \
               --grpc-web
+
+            echo "✅ Login OK"
           '''
         }
       }
@@ -70,14 +81,18 @@ spec:
         container('argocd-cli') {
           sh '''
             echo "🔁 Syncing applications..."
+
             argocd app sync payments --grpc-web
             argocd app sync booking  --grpc-web
             argocd app sync search   --grpc-web
 
             echo "⏱ Waiting for apps to become healthy..."
+
             argocd app wait payments --health --timeout 300 --grpc-web
             argocd app wait booking  --health --timeout 300 --grpc-web
             argocd app wait search   --health --timeout 300 --grpc-web
+
+            echo "✅ All apps synced & healthy."
           '''
         }
       }
